@@ -15,7 +15,6 @@ page = agent.get("http://www.openrice.com/restaurant/sr2.htm?shopid=32108")
 # specify [2] because the address stays in the third td tag element
 #
 address_element = page.search("table.addetail tr td div table tr td")[2]
-puts address_element.text
 
 # Special handling of chinese characters
 unicode_colon = '英文地址：'

@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require 'rubygems'
 require 'mechanize'
 
@@ -29,7 +31,7 @@ end
 # main program logic #
 ######################
 agent = Mechanize.new
-page = agent.get('http://www.openrice.com/english/restaurant/advancesearch.htm?tc=top2')
+page = agent.get('http://www.openrice.com/restaurant/advancesearch.htm?tc=top2')
 
 
 # STEP 1: retrieve districts list
@@ -37,8 +39,8 @@ districts = get_all_option_values(page,"district_id")
 # take away those "ALL" options
 districts.reject!{ |district| district[0]  =~ /999$/ }
 
-puts "No. of districts: #{districts.count}"
-puts "Districts:        #{districts}"
+# puts "No. of districts: #{districts.count}"
+# puts "Districts:        #{districts}"
 
 
 # STEP 2: retrieve cuisines list

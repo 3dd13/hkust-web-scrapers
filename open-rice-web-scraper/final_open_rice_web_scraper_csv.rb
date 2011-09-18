@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require 'rubygems'
 require 'mechanize'
 require 'csv'
@@ -34,15 +36,17 @@ end
 def parse_single_page_search_result(page, district_name, cuisine_name)
   single_page_rows = []
   
-  page.search(".sr1_list").each do |shop|
-    shop_name        = shop.search(".restname").children.first.text
-    shop_tel         = shop.search(".tel").text
-    shop_expenditure = shop.search(".price").text
-    shop_address     = shop.search(".add").text
-    shop_type        = shop.search(".type").children.text
-    shop_rating      = shop.search(".sr1score span").map do |score| score.text end.join('/')
+  page.search("#restlist table[cellspacing=\"5\"]").each do |shop|
+    shop_name        = shop.search(".resttitle").children.first.text.strip
+    shop_tel         = shop.search(".listphone").text.strip
+    shop_expenditure = shop.search(".listprice").text.strip
+    shop_address     = shop.search(".listadd").text.strip
+    shop_type        = shop.search(".listdish").children.text.strip
+    
+    shop_rating_good = shop.search('tr[2]/td[2]/span[1]').text.strip
+    shop_rating_bad  = shop.search('tr[2]/td[2]/span[4]').text.strip
 
-    single_page_rows << [shop_name, shop_tel, district_name, shop_address, shop_type, cuisine_name, shop_expenditure, shop_rating]
+    single_page_rows << [shop_name, shop_tel, district_name, shop_address, shop_type, cuisine_name, shop_expenditure, shop_rating_good, shop_rating_bad]
   end
   
   single_page_rows
@@ -52,7 +56,7 @@ end
 def max_paging_count(page)
   field = page.search('.pagination form div')
   # use regular expression to extract the max. result page value
-  field.first.text.match(/Jump to page\(1-(.*)\)/)[1] if field.any?
+  field.first.text.match(/\(1-(.*)\)/)[1] if field.any?
 end
 
 
@@ -62,7 +66,7 @@ end
 start_time = Time.now
 
 agent = Mechanize.new
-page = agent.get('http://www.openrice.com/english/restaurant/advancesearch.htm?tc=top2')
+page = agent.get('http://www.openrice.com/restaurant/advancesearch.htm?tc=top2')
 
 
 # STEP 1: retrieve districts list
@@ -86,6 +90,7 @@ puts "Cuisines:        #{cuisines}"
 # STEP 3: search restaurant by District and Cuisine
 result_rows = []
 
+district_count = 0
 districts.each do |district|
   district_count += 1
   district_id = district[0]
@@ -97,7 +102,7 @@ districts.each do |district|
     cuisine_name = cuisine[1]
     
     # submit search query with district Id and cuisine Id
-    url = "http://www.openrice.com/english/restaurant/sr1.htm?district_id=#{district_id}&cuisine_id=#{cuisine_id}"
+    url = "http://www.openrice.com/restaurant/sr1.htm?district_id=#{district_id}&cuisine_id=#{cuisine_id}"
 
     agent = Mechanize.new
     # page now stores the search result page
@@ -126,7 +131,7 @@ puts "Restaurant:         #{result_rows}"
 
 # FINAL STEP: storing data into csv file
 CSV.open("open_rice_export.csv", 'w') {|csv|
-  csv << ["shop_name", "tel", "district_name", "shop_address", "shop_type", "cuisine_name", "shop_expenditure", "rating(Good/Bad)"]
+  csv << ["shop_name", "tel", "district_name", "shop_address", "shop_type", "cuisine_name", "shop_expenditure", "rating(Good)", "rating(Bad)"]
   result_rows.each do |row|
     csv << row
   end

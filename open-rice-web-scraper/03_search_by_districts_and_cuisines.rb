@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require 'rubygems'
 require 'mechanize'
 
@@ -29,7 +31,7 @@ end
 # main program logic #
 ######################
 agent = Mechanize.new
-page = agent.get('http://www.openrice.com/english/restaurant/advancesearch.htm?tc=top2')
+page = agent.get('http://www.openrice.com/restaurant/advancesearch.htm?tc=top2')
 
 
 # STEP 1: retrieve districts list
@@ -37,8 +39,8 @@ districts = get_all_option_values(page,"district_id")
 # take away those "ALL" options
 districts.reject!{ |district| district[0]  =~ /999$/ }
 
-puts "No. of districts: #{districts.count}"
-puts "Districts:        #{districts}"
+# puts "No. of districts: #{districts.count}"
+# puts "Districts:        #{districts}"
 
 
 # STEP 2: retrieve cuisines list
@@ -46,11 +48,12 @@ cuisines = get_all_checkbox_values(page, "cuisine_id")
 # take away those "ALL" options
 cuisines.reject!{ |cuisine| cuisine[0]  =~ /999$/ }
 
-puts "No. of cuisines: #{cuisines.count}"
-puts "Cuisines:        #{cuisines}"
+# puts "No. of cuisines: #{cuisines.count}"
+# puts "Cuisines:        #{cuisines}"
 
 
 # STEP 3: search restaurant by District and Cuisine
+district_count = 0
 districts.each do |district|
   district_count += 1
   district_id = district[0]
@@ -62,10 +65,12 @@ districts.each do |district|
     cuisine_name = cuisine[1]
     
     # submit search query with district Id and cuisine Id
-    url = "http://www.openrice.com/english/restaurant/sr1.htm?district_id=#{district_id}&cuisine_id=#{cuisine_id}"
-
+    url = "http://www.openrice.com/restaurant/sr1.htm?district_id=#{district_id}&cuisine_id=#{cuisine_id}"
+    
     agent = Mechanize.new
     # page now stores the search result page
     page = agent.get(url)
+    
+    puts "url #{url}, Page Title: #{page.title}"
   end
 end

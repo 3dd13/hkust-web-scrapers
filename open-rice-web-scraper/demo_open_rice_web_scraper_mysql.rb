@@ -2,6 +2,7 @@
 
 require 'rubygems'
 require 'mechanize'
+require "sequel"
 
 ####################
 # helper functions #
@@ -45,7 +46,7 @@ def parse_single_page_search_result(page, district_name, cuisine_name)
     shop_rating_good = shop.search('tr[2]/td[2]/span[1]').text.strip
     shop_rating_bad  = shop.search('tr[2]/td[2]/span[4]').text.strip
 
-    single_page_rows << [shop_name, shop_tel, shop_address, shop_type, shop_expenditure, shop_rating_good, shop_rating_bad, district_name, cuisine_name]
+    single_page_rows << [shop_name, shop_tel, district_name, shop_address, shop_type, cuisine_name, shop_expenditure, shop_rating_good, shop_rating_bad]
   end
   
   single_page_rows
@@ -62,6 +63,8 @@ end
 ######################
 # main program logic #
 ######################
+start_time = Time.now
+
 agent = Mechanize.new
 page = agent.get('http://www.openrice.com/restaurant/advancesearch.htm?tc=top2')
 
@@ -71,8 +74,8 @@ districts = get_all_option_values(page,"district_id")
 # take away those "ALL" options
 districts.reject!{ |district| district[0]  =~ /999$/ }
 
-# puts "No. of districts: #{districts.count}"
-# puts "Districts:        #{districts}"
+puts "No. of districts: #{districts.count}"
+puts "Districts:        #{districts}"
 
 
 # STEP 2: retrieve cuisines list
@@ -80,21 +83,23 @@ cuisines = get_all_checkbox_values(page, "cuisine_id")
 # take away those "ALL" options
 cuisines.reject!{ |cuisine| cuisine[0]  =~ /999$/ }
 
-# puts "No. of cuisines: #{cuisines.count}"
-# puts "Cuisines:        #{cuisines}"
+puts "No. of cuisines: #{cuisines.count}"
+puts "Cuisines:        #{cuisines}"
 
 
 # STEP 3: search restaurant by District and Cuisine
 result_rows = []
 
 district_count = 0
-districts.each do |district|
+# LIMIT to 2 only for DEMO
+districts.first(2).each do |district|
   district_count += 1
   district_id = district[0]
   district_name = district[1]  
   puts "Processing: #{district_count}, #{district_name}"
   
-  cuisines.each do |cuisine|
+  cuisines.first(2).each do |cuisine|
+    sleep(1)
     cuisine_id = cuisine[0]
     cuisine_name = cuisine[1]
     
@@ -112,16 +117,11 @@ districts.each do |district|
     
     # STEP 5: parse other pages search results
     page_count = max_paging_count(page)
-    
-    puts "page_count: #{page_count}"
     if page_count
       (2..page_count.to_i).each do |page_index|
         # submit search query with district Id, cuisine Id and page number
         page = agent.get("#{url}&page=#{page_index}")
-        single_page_result = parse_single_page_search_result(page, district_name, cuisine_name)
-        
-        puts "other page result: Page #{page_index}, #{single_page_result}"
-        result_rows += single_page_result
+        result_rows += parse_single_page_search_result(page, district_name, cuisine_name)
       end
     end
   end
@@ -129,3 +129,50 @@ end
 
 puts "No. of restaurants: #{result_rows.count}"
 puts "Restaurant:         #{result_rows}"
+
+puts "Connect to MySQL"
+# FINAL STEP: storing data into database
+DB = Sequel.connect(:adapter => 'mysql', 
+                    :user => 'xxxx',
+                    :password=>'xxxx',
+                    :host => '127.0.0.1',
+                    :database => "web_scrapers",
+                    :port => 3306,
+                    :encoding => "utf8")
+
+# create a db table
+db_table_name = "open_rice".to_sym
+if !DB.table_exists?(db_table_name)
+  DB.create_table(db_table_name) do
+    String  :shop_name
+    String  :tel
+    String  :district_name
+    String  :shop_address
+    String  :shop_type
+    String  :cuisine_name
+    String  :shop_expenditure
+    String  :rating_good
+    String  :rating_bad
+    Time    :download_time
+  end
+end
+
+# create a dataset from the items table
+puts "store into MySQL table"
+items = DB[db_table_name]
+result_rows.each do |row|
+  puts "inserting into db: #{row}"
+  items.insert(:shop_name        => row[0], 
+               :tel              => row[1], 
+               :district_name    => row[2], 
+               :shop_address     => row[3], 
+               :shop_type        => row[4], 
+               :cuisine_name     => row[5], 
+               :shop_expenditure => row[6], 
+               :rating_good      => row[7],
+               :rating_bad       => row[8],
+               :download_time    => start_time)
+end
+
+puts "Scraping Finished"
+puts Time.now - start_time

@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require 'rubygems'
 require 'mechanize'
 
@@ -20,7 +22,7 @@ end
 # main program logic #
 ######################
 agent = Mechanize.new
-page = agent.get('http://www.openrice.com/english/restaurant/advancesearch.htm?tc=top2')
+page = agent.get('http://www.openrice.com/restaurant/advancesearch.htm?tc=top2')
 
 
 # STEP 1: retrieve districts list

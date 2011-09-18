@@ -1,75 +1,137 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset='utf-8'>
+	<meta charset='utf-8'>
 
-  <title>3dd13/hkust-web-scrapers @ GitHub</title>
+	<title>3dd13 | Web Scrapers Sample Code for HKUST students | GitHub</title>
 
-  <style type="text/css">
-    body {
-      margin-top: 1.0em;
-      background-color: #171003;
-      font-family: Helvetica, Arial, FreeSans, san-serif;
-      color: #ffffff;
-    }
-    #container {
-      margin: 0 auto;
-      width: 700px;
-    }
-    h1 { font-size: 3.8em; color: #e8effc; margin-bottom: 3px; }
-    h1 .small { font-size: 0.4em; }
-    h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #e8effc; }
-    h3 { text-align: center; color: #e8effc; }
-    a { color: #e8effc; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-    pre { background: #000; color: #fff; padding: 15px;}
-    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
-  </style>
+	<style type="text/css">
+	body {
+    margin: 0px;
+		background-color: #272013;
+		font-family: Arial, Helvetica, FreeSans, san-serif;
+		color: #ffffff;
+	}
+	#header {
+		padding: 10px;
+		background-color: #369 ;
+	}
+	#header h1 {
+		margin: 5px 50px;
+	  font-size: 2.5em;
+	}
+	#container {
+
+	}
+	#content {
+		margin: 0 auto;
+		width: 700px;
+	}
+	h1 { color: #e8effc; margin-bottom: 3px; }
+	h1 .small { font-size: 0.4em; }
+	h1 a { text-decoration: none }
+	h2 { font-size: 1.5em; color: #e8effc; border-bottom: 2px solid #369 }
+	h3 { text-align: left; color: #e8effc; font-size: 1.2em }
+	a { color: #e8effc; }
+	.description { font-size: 1.2em; margin: 20px 50px; font-style: italic; text-align: right}
+	.download { float: right; }
+	pre { background: #000; color: #fff; padding: 10px; margin: 5px}
+	hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+	.footer { text-align:right; padding:10px 30px; font-style: italic; background-color: #135}
+	p {font-size: 0.8em}
+	.section {
+		margin: 20px 0px;
+		overflow:hidden;
+	}
+	</style>
 </head>
 
 <body>
-  <a href="http://github.com/3dd13/hkust-web-scrapers"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+	<a href="http://github.com/3dd13/hkust-web-scrapers"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
 
-  <div id="container">
+	<div id="container">
 
-    <div class="download">
-      <a href="http://github.com/3dd13/hkust-web-scrapers/zipball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
-      <a href="http://github.com/3dd13/hkust-web-scrapers/tarball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
-    </div>
+		<div id="header">
+			<h1>
+				<a href="http://github.com/3dd13/hkust-web-scrapers">Web Scrapers Sample Code</a>
+			</h1>
 
-    <h1><a href="http://github.com/3dd13/hkust-web-scrapers">hkust-web-scrapers</a>
-      <span class="small">by <a href="http://github.com/3dd13">3dd13</a></span></h1>
+			<div class="description">
+				Installation, Usage and Source Code Download
+			</div>
+		</div>
 
-    <div class="description">
-      Web Scraper code samples for HKUST students
-    </div>
+		<div id="content">
+			<div id="setup-instructions" class="section">
+				<h2>Environment Setup</h2>
+				<ul>
+					<li>Ruby 1.9.2 (<a href="http://www.ruby-lang.org/en/downloads/">Linux Family</a> | <a href="http://rubyinstaller.org/">Windows</a>)</li>
+					<li>Ruby Gems
+						<ul>
+						<li>mechanize <pre>gem install mechanize</pre></li>
+						<li>sequel <pre>gem install sequel</pre></li>
+						<li>mysql (the path for with-mysql-config depends on your installation environment) <pre>gem install mysql -- --with-mysql-config=/usr/bin/mysql_config</pre></li>
+						</ul>
+					</li>
+					<li>MySQL Database (required if you are going to use Database instead of CSV file)
+					  <ul>
+						  <li><a href="http://dev.mysql.com/downloads/mysql/">Download Installer</a></li>
+						  <li><a href="http://dev.mysql.com/downloads/gui-tools/5.0.html">Download Admin GUI</a> (use <a href="http://www.sequelpro.com/">Sequel Pro</a> if you use Mac OSX)</li>
+						  <li>After installation, create a database <i>web_scrapers</i> for the program to store data</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
 
-    <h2>Contact</h2>
-<p>3dd13 (tatonlto@gmail.com)<br/>      </p>
+			<div id="step-by-step-tutorial" class="section">
+				<h2>Step by Step tutorial, use openrice.com as an example</h2>
+				<ol>
+					<li><a href="https://github.com/3dd13/hkust-web-scrapers/blob/master/open-rice-web-scraper/01_scrape_available_districts.rb">Grab available districts</a></li>
+					<li><a href="https://github.com/3dd13/hkust-web-scrapers/blob/master/open-rice-web-scraper/02_scrape_available_cuisines.rb">Grab available cuisines</a></li>
+					<li><a href="https://github.com/3dd13/hkust-web-scrapers/blob/master/open-rice-web-scraper/03_search_by_districts_and_cuisines.rb">Submit search by district and cuisine</a></li>
+					<li><a href="https://github.com/3dd13/hkust-web-scrapers/blob/master/open-rice-web-scraper/04_parse_first_page_search_results.rb">Scrape restaurant info from search result</a></li>
+					<li><a href="https://github.com/3dd13/hkust-web-scrapers/blob/master/open-rice-web-scraper/05_parse_other_pages_search_results.rb">Parse pagination links and scrape all result pages</a></li>
+					<li>Final: <a href="https://github.com/3dd13/hkust-web-scrapers/blob/master/open-rice-web-scraper/final_open_rice_web_scraper_csv.rb">Save as CSV</a> | <a href="https://github.com/3dd13/hkust-web-scrapers/blob/master/open-rice-web-scraper/final_open_rice_web_scraper_mysql.rb">Store into Database</a></li>
+				</ol>
+			</div>
+			
+			<div id="steps-to-run-the-scraper" class="section">
+				<h2>How to run the scrapers</h2>
+				<h3>command to scrape restaurant data and store as .CSV file</h3>
+			  <pre>$ ruby final_open_rice_web_scraper_csv.rb</pre>
+			
+				<h3>command to scrape restaurant data and store into MySQL DB</h3>
+			  <pre>$ ruby final_open_rice_web_scraper_mysql.rb</pre>
+			</div>
+
+			<div id="download-section" class="section">
+				<h2>Download</h2>
+				<h3>Package:</h3>
+				<div id="download-package-links">
+					<a href="http://github.com/3dd13/hkust-web-scrapers/zipball/master">
+						<img border="0" width="90" src="http://github.com/images/modules/download/zip.png" />
+					</a>
+					<a href="http://github.com/3dd13/hkust-web-scrapers/tarball/master">
+						<img border="0" width="90" src="http://github.com/images/modules/download/tar.png" />
+					</a>
+				</div>
+
+        <h3>Open Source Repository:<h3>
+				<div id="download-source-code">
+					<p>Source Code available on github: <a href="http://github.com/3dd13/hkust-web-scrapers">3dd13/hkust-web-scrapers</a></p>
+					<p>You can also clone the project with <a href="http://git-scm.com">Git</a> by running:
+						<pre>$ git clone git://github.com/3dd13/hkust-web-scrapers</pre>
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="footer">
+			<span class="small author">by <a href="http://github.com/3dd13">3dd13</a></span>			
+		</div>
+
+	</div>
 
 
-    <h2>Download</h2>
-    <p>
-      You can download this project in either
-      <a href="http://github.com/3dd13/hkust-web-scrapers/zipball/master">zip</a> or
-      <a href="http://github.com/3dd13/hkust-web-scrapers/tarball/master">tar</a> formats.
-    </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/3dd13/hkust-web-scrapers</pre>
-    </p>
-
-    <div class="footer">
-      get the source code on GitHub : <a href="http://github.com/3dd13/hkust-web-scrapers">3dd13/hkust-web-scrapers</a>
-    </div>
-
-  </div>
-
-  
 </body>
 </html>

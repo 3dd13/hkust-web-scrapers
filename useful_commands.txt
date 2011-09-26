@@ -1,0 +1,44 @@
+########################
+# Linux commands
+########################
+
+
+# retrieve the command line history after using irb
+tail -50 ~/.irb-history
+
+
+
+# In Linux session, keep the command running even after you logout
+nohup [command] &
+
+# For example:
+nohup ruby yahoo_news_scraper.rb &
+
+
+
+# View and edit linux cron scheduled jobs
+crontab -e
+
+
+# Cron syntax format, run scraper at 05:00, ONLY on Sat and Sun
+0 5 * * 6,7 ruby ~/scrape_jobsdb.rb
+
+
+
+########################
+# Ruby code
+########################
+
+# printing messages to console output
+# it will be logged to nohup.out if you run in using nohup
+puts “Started at #{Time.now}”
+puts “Finished at #{Time.now}”
+
+
+# connecting to database using sequel and save the job status into it
+statuses = DB[:job_statuses]
+statuses.insert(:name       => “open_rice”,
+                :status     => “running”,
+                :created_at => Time.now)
+# read all the status in descending order
+statuses.order("created_at DESC")
